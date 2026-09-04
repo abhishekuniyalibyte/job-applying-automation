@@ -10,6 +10,14 @@ _COMPANY_SUFFIXES = {
 }
 _WS = re.compile(r"\s+")
 _PUNCT = re.compile(r"[^\w\s]")
+# Country/region synonyms, so the same place written differently yields one key.
+_LOCATION_SYNONYMS = {
+    "uk": "united kingdom", "gb": "united kingdom", "great britain": "united kingdom",
+    "us": "united states", "usa": "united states", "u s": "united states",
+    "u s a": "united states", "america": "united states", "united states of america": "united states",
+    "uae": "united arab emirates", "nl": "netherlands", "holland": "netherlands",
+    "deutschland": "germany", "espana": "spain", "brasil": "brazil",
+}
 
 
 def normalize_text(s: str | None) -> str:
@@ -32,9 +40,29 @@ def normalize_title(title: str | None) -> str:
 
 
 def normalize_location(location: str | None) -> str:
-    # "London, UK" and "London, United Kingdom" -> keep the first significant part to be tolerant
-    parts = [p.strip() for p in re.split(r",| - |/", location or "") if p.strip()]
-    return normalize_text(parts[0]) if parts else ""
+    """Canonicalise a location for deduplication.
+
+    Country/region synonyms are unified so "London, UK" == "London, United Kingdom", but the
+    geography is preserved so "Remote, Poland" stays distinct from "Remote, United Kingdom".
+    Multi-location postings ("Remote, Canada; Remote, US") keep every part, order-independently.
+    """
+    if not location:
+        return ""
+    # ";" and "|" separate whole locations; "," and "-" separate parts within one location.
+    groups = [g for g in re.split(r"[;|]", location) if g.strip()]
+    canonical: list[str] = []
+    for group in groups:
+        parts = [normalize_text(p) for p in re.split(r",|/| - ", group)]
+        tokens = [_LOCATION_SYNONYMS.get(p, p) for p in parts if p]
+        # Drop a bare "remote" qualifier only when it is not the entire location
+        significant = [t for t in tokens if t != "remote"] or tokens
+        seen: list[str] = []
+        for t in significant:
+            if t not in seen:
+                seen.append(t)
+        if seen:
+            canonical.append(" ".join(seen))
+    return " ".join(sorted(set(canonical)))
 
 
 def dedupe_key(company: str | None, title: str | None, location: str | None) -> str:
