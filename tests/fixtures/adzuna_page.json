@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "id": "4567890123",
+      "title": "Senior Backend Engineer (Python)",
+      "description": "We are hiring a Senior Backend Engineer to work with Python, FastAPI and PostgreSQL. Remote friendly.",
+      "company": {"display_name": "Acme Ltd"},
+      "location": {"display_name": "London, UK", "area": ["UK", "London"]},
+      "salary_min": 70000,
+      "salary_max": 90000,
+      "salary_is_predicted": "0",
+      "created": "2026-08-30T10:15:00Z",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/land/ad/4567890123?se=abc&utm_medium=api&utm_source=xyz",
+      "contract_time": "full_time",
+      "category": {"label": "IT Jobs"}
+    },
+    {
+      "id": "4567890124",
+      "title": "Data Analyst",
+      "description": "Excel and SQL analyst role.",
+      "company": {"display_name": "Beta Inc"},
+      "location": {"display_name": "Manchester, UK"},
+      "created": "2026-08-01T00:00:00Z",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/land/ad/4567890124"
+    }
+  ],
+  "count": 2
+}
